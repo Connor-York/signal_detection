@@ -30,6 +30,7 @@ def pose_callback(msg):
     y = msg.pose.pose.position.y
     global current_pose 
     current_pose = [x,y]
+    
 
 
 if __name__ == '__main__':
@@ -39,16 +40,18 @@ if __name__ == '__main__':
     
     with open(path, mode='w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['timestamp','pose_x','pose_y','rssi'])
+        writer.writerow(['timestamp','pose_x','pose_y','xbee','lora'])
         
         while not rospy.is_shutdown():
 
             
             if ser.in_waiting:
-                arduino_output = ser.readline().decode('utf-8').strip()
+                arduino_output = ser.readline().decode('utf-8').strip().split(',')
                 timestamp = round(time.time() - start_time,2)
                 
-                datapack = [timestamp, current_pose[0], current_pose[1], arduino_output]
+                
+                datapack = [timestamp, current_pose[0], current_pose[1], int(arduino_output[0]), int(arduino_output[1])]
+                #rospy.loginfo(datapack)
                 writer.writerow(datapack)
         
 

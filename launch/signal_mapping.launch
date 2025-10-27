@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+    
+    <node pkg="signal_detection" type="signal_mapping.py" name="signal_mapping" output="screen">   
+        <!-- <rosparam command="load" file="$(find leo_navigation)/config/Robot_config.yaml" />  -->
+    </node>
+
+
+</launch>

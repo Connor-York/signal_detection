@@ -70,6 +70,7 @@ void read_lora(){
 }
 
 void loop() {
+
   read_xbee();
   read_lora();
 

@@ -11,6 +11,7 @@ import time
 import datetime
 import serial
 import rospkg
+import numpy as np
 
 rp = rospkg.RosPack()
 package_path = rp.get_path('signal_detection')
@@ -47,6 +48,8 @@ def status_callback(msg):
 def quat_to_yaw(q):
     return euler_from_quaternion((q.x, q.y, q.z, q.w))[2]
 
+def ewma(val, avg, alpha):
+    return alpha*val + (1-alpha)*avg
 
 def tf_updater_thread(cached_pose, stop_event, rate_hz=50.0):
     """
@@ -94,24 +97,39 @@ def main():
     tf_thread = threading.Thread(target=tf_updater_thread, args=(cached_pose, stop_event), daemon=True)
     tf_thread.start()
     rospy.loginfo("Started TF updater thread")
+    
+    count = 0
+    starting_avg = []
 
     with open(path, mode='w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['timestamp','curr_patrol','curr_goal','pose_x','pose_y','pose_a','xbee']) #'m5','xbee','lora'])
+        writer.writerow(['timestamp','curr_patrol','curr_goal','pose_x','pose_y','pose_a','rssi', 'rssi_ewma']) #'m5','xbee','lora'])
         
         try:
             while not rospy.is_shutdown():
                 
                 if ser.in_waiting:
-                    arduino_output = ser.readline().decode('utf-8').strip() #.split(',')
+                    rssi_val = int(ser.readline().decode('utf-8').strip()) #.split(',')
                     timestamp = round(time.time() - start_time,2)
+                    
+                    if count < 10:
+                        starting_avg.append(rssi_val)
+                        avg_rssi = rssi_val
+                        count += 1
+                    elif count == 20: ## Calculate the starting average from the mean of the first 20 readings (whilst stood still)
+                        avg_rssi = np.mean(starting_avg)
+                        rospy.loginfo("FINISHED CALCULATING INITIAL AVERAGE")
+                        count +=1
+                    else:
+                        avg_rssi = ewma(rssi_val, avg_rssi, 0.01)
+                    
                     x, y, yaw = cached_pose.get()
-                    datapack = [timestamp, patrol_status[1], patrol_status[0], x, y, yaw, int(arduino_output)] #int(arduino_output[0]), int(arduino_output[1])]
+                    datapack = [timestamp, patrol_status[1], patrol_status[0], x, y, yaw, rssi_val, avg_rssi] #int(arduino_output[0]), int(arduino_output[1])]
                     rospy.loginfo(datapack)
                     writer.writerow(datapack)
                     
                     current_time = time.time()
-                    if current_time - prev_time >= 1:
+                    if current_time - prev_time >= 5:
                         rospy.loginfo(datapack)
                         prev_time = current_time
                 else:

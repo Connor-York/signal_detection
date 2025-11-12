@@ -6,6 +6,11 @@ XBee xbee;
 
 uint8_t count = 0;
 uint8_t payload[] = ">:)";
+// Tx16Request takes: 16-bit destination, pointer to payload, length
+Tx16Request tx = Tx16Request(0xFFFF, payload, sizeof(payload));
+
+unsigned long loop_period = 50;
+unsigned long time_check = millis();
 
 void setup() {
   Serial.begin(9600);
@@ -16,9 +21,10 @@ void setup() {
 }
 
 void loop() {  
-  // Tx16Request takes: 16-bit destination, pointer to payload, length
-  Tx16Request tx = Tx16Request(0xFFFF, payload, sizeof(payload));
-  xbee.send(tx);
 
-  delay(20); // 50 Hz
+  unsigned long now = millis();
+  if (now - time_check >= loop_period) {
+    xbee.send(tx);  
+    time_check = now;
+  }
 }

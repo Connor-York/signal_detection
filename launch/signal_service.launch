@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+    
+    <node pkg="signal_detection" type="signal_service.py" name="signal_service" output="screen">   
+    </node>
+
+
+</launch>

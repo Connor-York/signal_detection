@@ -29,8 +29,8 @@ void read_xbee(){
       //Serial.print(rx16.getRssi(), DEC); Serial.print("\n");
       xbee_rssi = rx16.getRssi();
       Serial.print("-"); Serial.print(xbee_rssi, DEC); Serial.print("\n");
-      Serial.println("======");
-      Serial.println(millis() - time_check);
+      // Serial.println("======");
+      // Serial.println(millis() - time_check);
       time_check=millis();
       // xbee_rssi = rx16.getRssi();
     }
@@ -41,9 +41,9 @@ void read_xbee(){
     // and return current rssi
     if (xbee_rssi != -999) { // If no reading had yet just ignore
       Serial.print("-"); Serial.print(xbee_rssi, DEC); Serial.print("\n");
-      Serial.println("======");
-      Serial.println("Missed");
-      Serial.println(millis() - time_check);
+      // Serial.println("======");
+      // Serial.println("Missed");
+      // Serial.println(millis() - time_check);
       time_check=millis();
     }
   }

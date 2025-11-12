@@ -1,0 +1,8 @@
+# GetSignalData.srv
+# Request is empty since we just want latest data
+---
+float64 x
+float64 y
+float64 yaw
+float64 rssi_val
+float64 avg_rssi

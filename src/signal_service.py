@@ -79,7 +79,7 @@ def main():
     try:
         ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
     except Exception as e:
-        rospy.logerr("Could not open serial port: %s", e)
+        rospy.logerr("- signal service - Could not open serial port: %s", e)
         return
     
     tf_buf = tf2_ros.Buffer()
@@ -102,10 +102,10 @@ def main():
     # start TF updater thread
     tf_thread = threading.Thread(target=tf_updater_thread, args=(cached_pose, stop_event), daemon=True)
     tf_thread.start()
-    rospy.loginfo("Started TF updater thread")
+    rospy.loginfo("- signal service - Started TF updater thread")
     
     service = rospy.Service('get_signal_data', GetSignalData, handle_get_signal_data)
-    rospy.loginfo("Signal service 'get_signal_data' is ready")
+    rospy.loginfo("- signal service - Signal service 'get_signal_data' is ready")
     
     count = 0
     starting_avg = []
@@ -122,18 +122,18 @@ def main():
                     count += 1
                 elif count == 20: ## Calculate the starting average from the mean of the first 20 readings (whilst stood still)
                     avg_rssi = np.mean(starting_avg)
-                    rospy.loginfo("FINISHED CALCULATING INITIAL AVERAGE")
+                    rospy.loginfo("- signal service - ewma start")
                     count +=1
                 else:
                     avg_rssi = ewma(rssi_val, avg_rssi, 0.01)
                     
                 
-                cached_pose.update_rssi(rssi_val, avg_rssi)
+                cached_pose.update_rssi(rssi_val, int(avg_rssi))
                 
-                current_time = time.time()
-                if current_time - prev_time >= 5:
-                    rospy.loginfo(cached_pose.get())
-                    prev_time = current_time
+                # current_time = time.time()
+                # if current_time - prev_time >= 5:
+                #     rospy.loginfo(cached_pose.get())
+                #     prev_time = current_time
             else:
                 time.sleep(0.01)
     except KeyboardInterrupt:

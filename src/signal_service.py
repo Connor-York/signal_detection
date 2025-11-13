@@ -63,7 +63,7 @@ def tf_updater_thread(cached_pose, stop_event, rate_hz=50.0):
             x = t.transform.translation.x
             y = t.transform.translation.y
             yaw = quat_to_yaw(t.transform.rotation)
-            cached_pose.update(x, y, yaw)
+            cached_pose.update_pose(x, y, yaw)
         except Exception:
             # ignore lookup failures; we'll try again on the next loop
             pass

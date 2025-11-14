@@ -2,4 +2,4 @@
 arduino-cli compile --fqbn arduino:avr:leonardo arduino_interface.ino
 arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:leonardo arduino_interface.ino
 
-#arduino-cli monitor -p /dev/ttyACM0 -c 9600
+#arduino-cli monitor -p /dev/ttyACM0 -c 115200

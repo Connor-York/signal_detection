@@ -110,11 +110,15 @@ def main():
     count = 0
     starting_avg = []
     
+    time_constant = 5 #Tau (time constant) for ewma in s 
+    
     try:
         while not rospy.is_shutdown():
             
             if ser.in_waiting:
-                rssi_val = int(ser.readline().decode('utf-8').strip()) #.split(',')
+                message = ser.readline().decode('utf-8').strip().split(',')
+                rssi_val = int(message[0])
+                time_since_last = int(message[1])
                 
                 if count < 20:
                     starting_avg.append(rssi_val)
@@ -125,7 +129,11 @@ def main():
                     rospy.loginfo("- signal service - ewma start")
                     count +=1
                 else:
-                    avg_rssi = ewma(rssi_val, avg_rssi, 0.01)
+                    dT = time_since_last * 0.001
+                    alpha = 1 - np.exp(-dT/time_constant)
+                    # rospy.loginfo(f"dT = {dT}, alpha = {alpha}")
+                    avg_rssi = ewma(rssi_val, avg_rssi, alpha)
+                    # rospy.loginfo(f"RSSI = raw: {rssi_val} | avg: {avg_rssi}")
                     
                 
                 cached_pose.update_rssi(rssi_val, int(avg_rssi))

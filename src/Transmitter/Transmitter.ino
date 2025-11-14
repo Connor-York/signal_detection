@@ -13,8 +13,8 @@ unsigned long loop_period = 50;
 unsigned long time_check = millis();
 
 void setup() {
-  Serial.begin(9600);
-  xbeeSerial.begin(9600);
+  Serial.begin(115200);
+  xbeeSerial.begin(115200);
   xbee.setSerial(xbeeSerial);
   delay(100);
   Serial.println("XBee sender starting (802.15.4, API)");

@@ -11,6 +11,7 @@ import time
 import datetime
 import serial
 import rospkg
+import ast
 import numpy as np
 
 rp = rospkg.RosPack()
@@ -27,9 +28,14 @@ child_frame = "base_footprint"
 class CachedPose:
     def __init__(self):
         self.lock = threading.Lock()
-        self.x = rospy.get_param("/amcl/initial_pose_x")
-        self.y = rospy.get_param("/amcl/initial_pose_y")
-        self.yaw = rospy.get_param("/amcl/initial_pose_a")
+        # self.x = rospy.get_param("/amcl/initial_pose_x")
+        # self.y = rospy.get_param("/amcl/initial_pose_y")
+        # self.yaw = rospy.get_param("/amcl/initial_pose_a")
+        pose_str = rospy.get_param("/slam_toolbox/map_start_pose")
+        pose_list = ast.literal_eval(pose_str)
+        self.pose_x = pose_list[0]
+        self.pose_y = pose_list[1]
+        self.pose_yaw = pose_list[2]
         
     def update(self, x, y, yaw):
         with self.lock:

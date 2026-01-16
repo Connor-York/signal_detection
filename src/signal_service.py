@@ -125,6 +125,7 @@ def main():
                     avg_rssi = rssi_val
                     count += 1
                 elif count == 20: ## Calculate the starting average from the mean of the first 20 readings (whilst stood still)
+                    starting_avg.append(rssi_val)
                     avg_rssi = np.mean(starting_avg)
                     rospy.loginfo("- signal service - ewma start")
                     count +=1

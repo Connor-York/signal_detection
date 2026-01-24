@@ -86,7 +86,7 @@ def main():
     prev_time = start_time  
     
     try:
-        ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+        ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
     except Exception as e:
         rospy.logerr("- signal service - Could not open serial port: %s", e)
         return
